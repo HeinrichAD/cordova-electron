@@ -1,25 +1,36 @@
 // Platform: electron
 // 1dc70ecab3f3f41df32b53e4d47765bc55606c04
-/*
- Licensed to the Apache Software Foundation (ASF) under one
- or more contributor license agreements.  See the NOTICE file
- distributed with this work for additional information
- regarding copyright ownership.  The ASF licenses this file
- to you under the Apache License, Version 2.0 (the
- "License"); you may not use this file except in compliance
- with the License.  You may obtain a copy of the License at
- 
-     http://www.apache.org/licenses/LICENSE-2.0
- 
- Unless required by applicable law or agreed to in writing,
- software distributed under the License is distributed on an
- "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- KIND, either express or implied.  See the License for the
- specific language governing permissions and limitations
- under the License.
-*/
-;(function() {
-var PLATFORM_VERSION_BUILD_LABEL = 'N/A';
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ ***************************************************************
+ * 
+ * This is based on the browser platform.
+ * Note: The electron platform has the browser platform as fallback for plugins.
+**/
+
+// Backup require module.
+// Require external modules will usefull/usable/mabey necessary for electron plugins.
+const electronRequire = require;
+delete require;
+
+(function() {
+var PLATFORM_VERSION_BUILD_LABEL = ((electronRequire) && electronRequire('./../cordova/version')) || 'N/A';
 // file: src/scripts/require.js
 
 /*jshint -W079 */
@@ -54,9 +65,10 @@ var require,
         return module.exports;
     }
 
-    require = function (id) {
-        if (!modules[id]) {
-            throw "module " + id + " not found";
+    require = function (id, forceExternal) {
+        if (forceExternal || !modules[id]) {
+            // External module?
+            return electronRequire(id);
         } else if (id in inProgressModules) {
             var cycle = requireStack.slice(inProgressModules[id]).join('->') + '->' + id;
             throw "Cycle in require graph: " + cycle;

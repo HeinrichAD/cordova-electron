@@ -1,6 +1,4 @@
-#!/usr/bin/env node
-
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,32 +15,51 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
- */
- 
-var fs = require('fs'),
-    shjs = require('shelljs'),
-    path = require('path'),
-    check_reqs = require('./check_reqs'),
-    platformBuildDir = path.join('platforms', 'browser', 'build');
+**/
 
-exports.cleanProject = function(){
-
-    // Check that requirements are (stil) met
-    if (!check_reqs.run()) {
-        console.error('Please make sure you meet the software requirements in order to clean an browser cordova project');
-        process.exit(2);
-    }
-    
-    console.log('Cleaning Browser project');
-    try {
-        if (fs.existsSync(platformBuildDir)) {
-            shjs.rm('-r', platformBuildDir);
-        }
-    }
-    catch(err) {
-        console.log('could not remove '+platformBuildDir+' : '+err.message);
-    }
+const Q          = require('Q');
+const fs         = require('fs');
+const shell      = require('shelljs');
+const path       = require('path');
+const Utils      = require('./utils');
+const eventSetup = require('./event-log');
 
 
-}
+/**
+ * Display clean command help.
+**/
+exports.help = function(args) {
+  let events = eventSetup();
+  events.emit('log', 'Implement Help');
+};
 
+/**
+ * Clean electron project.
+ * Wipe out platform build and cleanup platform www directory.
+ *
+ * @param {object|Array}  [options]  - Clean options.   e.g.: {"verbose":true,"argv":[],"fetch":true}
+ * @param {EventEmitter}  [events]   - 
+ * @param {Api}           [api]      - Api.js instance
+ *
+ * @returns {Promise}
+**/
+exports.run = function(options, events, api) {
+  //let utils = (api) ? api : new Utils(Utils.PLATFORM_NAME, path.join(__dirname, './../..'), events);
+  let utils = (api) ? api : new Utils(null, null, events);
+  //let utils = (api) ? api : new Utils();
+  events = utils.events;
+  //events.emit('verbose', 'clean.run ' + JSON.stringify(arguments));
+  let d = Q.defer();
+
+  events.emit('log', 'Cleaning electron project.');
+
+  // Cleanup platform www.
+  utils.cleanupWww();
+
+  // Wipe out platform build.
+  if (fs.existsSync(utils.platformBuildDir)) {
+    shell.rm('-rf', utils.platformBuildDir);
+  }
+
+  return d.promise;
+};

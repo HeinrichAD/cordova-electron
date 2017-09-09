@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,8 +17,31 @@
  * under the License.
 **/
 
-// Coho updates this line:
-const VERSION = "0.0.1-dev";
+const {
+  CordovaLogger,
+  events //:selfEvents
+} = require('cordova-common');
 
-exports = VERSION;
-//console.log(VERSION);
+
+/**
+ * Setup event emitter.
+ *
+ * @param {EventEmitter}  [externalEventEmitter]  - 
+ *
+ * @returns {EventEmitter}
+**/
+module.exports = function (externalEventEmitter) {
+  // Prefer external event emitter.
+  if (externalEventEmitter) {
+    // This will make the platform internal events visible outside
+    events.forwardEventsTo(externalEventEmitter);
+    return externalEventEmitter;
+  }
+
+  // Add default event emitter if there non.
+  if (!events || events._eventsCount < 1) {
+    CordovaLogger.get().subscribe(events);
+  }
+
+  return events;
+};

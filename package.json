@@ -4,8 +4,7 @@
   "description": "Adding electron as a platform for cordova",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./node_modules/electron-prebuilt/dist/Electron.app/Contents/MacOS/Electron ."
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "kewords": [
     "cordova",
@@ -15,9 +14,11 @@
   "author": "Steve Gill",
   "license": "Apache Version 2.0",
   "dependencies": {
+    "cordova-common": "^2.0.3",
+    "electron": "^1.7.5",
+    "electron-builder": "^19.22.1",
     "q": "^1.4.0",
-    "shelljs": "^0.4.0",
-    "electron-prebuilt": "^0.27.1"
+    "shelljs": "^0.4.0"
   },
   "bundleDependencies": [
     "q",
